@@ -36,6 +36,7 @@
 #include <libhal-util/serial.hpp>
 #include <libhal-util/steady_clock.hpp>
 #include <libhal/pwm.hpp>
+#include <libhal-actuator/rc_servo.hpp>
 #include <libhal/units.hpp>
 
 #include <resource_list.hpp>
@@ -89,6 +90,25 @@ hal::v5::strong_ptr<hal::serial> console()
   if (not console_ptr) {
     console_ptr = hal::v5::make_strong_ptr<hal::stm32f1::uart>(
       driver_allocator(), hal::port<1>, hal::buffer<128>);
+  }
+  return console_ptr;
+}
+
+
+hal::v5::optional_ptr<hal::actuator::rc_servo> carousel_servo_ptr;
+hal::v5::strong_ptr<hal::actuator::rc_servo> carousel_servo()
+{
+  if (not carousel_servo_ptr) {
+    auto carousel_servo_pwm = pwm0();
+    hal::actuator::rc_servo::settings carousel_servo_settings{
+      .frequency = 50;
+      .min_angle = 0;
+      .max_angle = 180;
+      .min_microseconds = 600;
+      .max_microseconds = 2400;
+    };
+    carousel_servo_ptr = hal::v5::make_strong_ptr<hal::actuator::rc_servo>(
+      driver_allocator(), carousel_servo_pwm, carousel_servo_settings);
   }
   return console_ptr;
 }
@@ -196,12 +216,16 @@ auto& timer3()
   static hal::stm32f1::general_purpose_timer<st_peripheral::timer3> timer3{};
   return timer3;
 }
-
+hal::v5::strong_ptr<hal::pwm> pwm0(){
+  static auto timer_old_pwm = timer1().acquire_pwm(hal::stm32f1::timer1_pin::pa8);
+  return hal::v5::make_strong_ptr<decltype(timer_old_pwm)>(
+    driver_allocator(), std::move(timer_old_pwm));
+}
 hal::v5::strong_ptr<hal::pwm16_channel> pwm_channel_0()
 {
   auto timer_pwm_channel =
     timer3().acquire_pwm16_channel(hal::stm32f1::timer3_pin::pa6);
-  return hal::v5::make_strong_ptr<decltype(timer_pwm_channel)>(
+  return hal::v5::make_strong_ptr<hal::pwm16(timer_pwm_channel)>(
     driver_allocator(), std::move(timer_pwm_channel));
 }
 
