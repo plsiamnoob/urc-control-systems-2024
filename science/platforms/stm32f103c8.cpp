@@ -94,25 +94,6 @@ hal::v5::strong_ptr<hal::serial> console()
   return console_ptr;
 }
 
-
-hal::v5::optional_ptr<hal::actuator::rc_servo> carousel_servo_ptr;
-hal::v5::strong_ptr<hal::actuator::rc_servo> carousel_servo()
-{
-  if (not carousel_servo_ptr) {
-    auto carousel_servo_pwm = pwm0();
-    hal::actuator::rc_servo::settings carousel_servo_settings{
-      .frequency = 50;
-      .min_angle = 0;
-      .max_angle = 180;
-      .min_microseconds = 600;
-      .max_microseconds = 2400;
-    };
-    carousel_servo_ptr = hal::v5::make_strong_ptr<hal::actuator::rc_servo>(
-      driver_allocator(), carousel_servo_pwm, carousel_servo_settings);
-  }
-  return console_ptr;
-}
-
 hal::v5::optional_ptr<hal::output_pin> led_ptr;
 hal::v5::strong_ptr<hal::output_pin> status_led()
 {
@@ -216,16 +197,12 @@ auto& timer3()
   static hal::stm32f1::general_purpose_timer<st_peripheral::timer3> timer3{};
   return timer3;
 }
-hal::v5::strong_ptr<hal::pwm> pwm0(){
-  static auto timer_old_pwm = timer1().acquire_pwm(hal::stm32f1::timer1_pin::pa8);
-  return hal::v5::make_strong_ptr<decltype(timer_old_pwm)>(
-    driver_allocator(), std::move(timer_old_pwm));
-}
+
 hal::v5::strong_ptr<hal::pwm16_channel> pwm_channel_0()
 {
   auto timer_pwm_channel =
     timer3().acquire_pwm16_channel(hal::stm32f1::timer3_pin::pa6);
-  return hal::v5::make_strong_ptr<hal::pwm16(timer_pwm_channel)>(
+  return hal::v5::make_strong_ptr<decltype(timer_pwm_channel)>(
     driver_allocator(), std::move(timer_pwm_channel));
 }
 
@@ -242,6 +219,30 @@ hal::v5::strong_ptr<hal::pwm_group_manager> pwm_frequency()
   auto timer_pwm_frequency = timer1().acquire_pwm_group_frequency();
   return hal::v5::make_strong_ptr<decltype(timer_pwm_frequency)>(
     driver_allocator(), std::move(timer_pwm_frequency));
+}
+
+hal::v5::strong_ptr<hal::pwm> pwm0(){
+  static auto timer_old_pwm = timer1().acquire_pwm(hal::stm32f1::timer1_pin::pa8);
+  return hal::v5::make_strong_ptr<decltype(timer_old_pwm)>(
+    driver_allocator(), std::move(timer_old_pwm));
+}
+
+hal::v5::optional_ptr<hal::actuator::rc_servo> carousel_servo_ptr;
+hal::v5::strong_ptr<hal::actuator::rc_servo> carousel_servo()
+{
+  if (not carousel_servo_ptr) {
+    auto carousel_servo_pwm = pwm0();
+    constexpr hal::actuator::rc_servo::settings carousel_servo_settings{
+      .frequency = 50,
+      .min_angle = 0,
+      .max_angle = 180,
+      .min_microseconds = 600,
+      .max_microseconds = 2400,
+    };
+    carousel_servo_ptr = hal::v5::make_strong_ptr<hal::actuator::rc_servo>(
+      driver_allocator(), *carousel_servo_pwm, carousel_servo_settings);
+  }
+  return carousel_servo_ptr;
 }
 
 hal::v5::strong_ptr<hal::can_transceiver> can_transceiver()
