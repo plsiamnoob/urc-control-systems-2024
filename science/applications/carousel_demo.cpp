@@ -20,17 +20,19 @@ namespace sjsu::science {
 
         try{
             auto carousel_servo_ptr = resources::carousel_servo();
-            hal::degrees degree=0;
+            int turn = 0;
             hal::print(*terminal, "Hello, Program Started\n");
-            hal::delay(*clock, 100ms);   
-            (*carousel_servo_ptr).position(degree);
+            hal::delay(*clock, 100ms); 
+            carousel carousel_servo(carousel_servo_ptr);
+            carousel_servo.home();
+            hal::print(*terminal, "Moved Servo to Start\n");
             while(true){
-                hal::print<128>(*terminal, "Moved Servo to %f degrees\n", degree);
+                hal::print<128>(*terminal, "Moved Servo to %d turns\n", turn);
                 hal::delay(*clock, 1000ms);
-                (*carousel_servo_ptr).position(degree);
+                carousel_servo.step_move(turn);
                 hal::print(*terminal, "Moved Servo one turn\n");
                 hal::delay(*clock, 100ms);
-                degree++;
+                turn+=1;
                 hal::print(*terminal, "Success!\n");
                 hal::delay(*clock, 100ms);
             }

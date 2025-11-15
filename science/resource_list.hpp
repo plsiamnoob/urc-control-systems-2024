@@ -72,6 +72,7 @@ hal::v5::strong_ptr<hal::adc> adc_0();
 hal::v5::strong_ptr<hal::adc> adc_1();
 hal::v5::strong_ptr<hal::i2c> i2c();
 hal::v5::strong_ptr<hal::actuator::rc_servo> carousel_servo();
+hal::v5::strong_ptr<hal::pwm> pwm0();
 
 inline void reset()
 {
