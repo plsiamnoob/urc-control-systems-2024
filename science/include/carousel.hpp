@@ -14,6 +14,7 @@ namespace sjsu::science{
             void step_backward(int turns);
         private:
             hal::v5::strong_ptr<hal::actuator::rc_servo> m_servo;
-            hal::degrees degrees;
+            hal::degrees vial_pos[10] = {0, 16, 35.5, 53, 74.6, 95, 115.75, 136.5, 157.12, 176};
+            int current_pos;
     };
 }

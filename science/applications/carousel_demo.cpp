@@ -13,34 +13,69 @@ using namespace hal::literals;
 using namespace std::chrono_literals;
 
 namespace sjsu::science {
-    void application(){
-        
+    void testing(carousel& carousel_servo){
         auto clock = resources::clock();
         auto terminal = resources::console();
-
-        try{
+        while(true){
+            hal::delay(*clock, 1000ms);
+            try{
+                carousel_servo.step_move();
+            }
+            catch(const char* err) {
+                hal::print<16>(*terminal, "%s\n", err);
+                break;
+            }
+            hal::print(*terminal, "Moved Servo forward one turn\n");
+            hal::delay(*clock, 100ms);
+        }
+        while(true){
+            hal::delay(*clock, 1000ms);
+            try{
+                carousel_servo.step_backward();
+            }
+            catch(const char* err) {
+                hal::print<16>(*terminal, "%s\n", err);
+                break;
+            }
+            hal::print(*terminal, "Moved Servo backward one turn\n");
+            hal::delay(*clock, 100ms);
+        }
+        while(true){
+            hal::delay(*clock, 1000ms);
+            try{
+                carousel_servo.step_move(3);
+            }
+            catch(const char* err) {
+                hal::print<16>(*terminal, "%s\n", err);
+                break;
+            }
+            hal::print(*terminal, "Moved Servo forward 3 turns\n");
+            hal::delay(*clock, 100ms);
+        }
+        while(true){
+            hal::delay(*clock, 1000ms);
+            try{
+                carousel_servo.step_backward(3);
+            }
+            catch(const char* err) {
+                hal::print<16>(*terminal, "%s\n", err);
+                break;
+            }
+            hal::print(*terminal, "Moved Servo backward 3 turns\n");
+            hal::delay(*clock, 100ms);
+        }
+    }
+    void application(){
+        auto clock = resources::clock();
+        auto terminal = resources::console();
             auto carousel_servo_ptr = resources::carousel_servo();
-            int turn = 0;
             hal::print(*terminal, "Hello, Program Started\n");
             hal::delay(*clock, 100ms); 
             carousel carousel_servo(carousel_servo_ptr);
             carousel_servo.home();
             hal::print(*terminal, "Moved Servo to Start\n");
-            while(true){
-                hal::print<128>(*terminal, "Moved Servo to %d turns\n", turn);
-                hal::delay(*clock, 1000ms);
-                carousel_servo.step_move(turn);
-                hal::print(*terminal, "Moved Servo one turn\n");
-                hal::delay(*clock, 100ms);
-                turn+=1;
-                hal::print(*terminal, "Success!\n");
-                hal::delay(*clock, 100ms);
-            }
-        }catch(hal::exception const& e ){
-            hal::print<128>(*terminal, "error code: %d\n", e.error_code());
-        }catch(std::exception const& e ){
-            hal::print<128>(*terminal, "error code: %s\n", e.what());
-        }
-    }
-        
+            hal::delay(*clock, 3000ms);
+            testing(carousel_servo);
+            
+    }    
 }

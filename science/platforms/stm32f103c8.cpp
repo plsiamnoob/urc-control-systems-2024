@@ -235,7 +235,7 @@ hal::v5::strong_ptr<hal::actuator::rc_servo> carousel_servo()
     constexpr hal::actuator::rc_servo::settings carousel_servo_settings{
       .frequency = 50,
       .min_angle = 0,
-      .max_angle = 180,
+      .max_angle = 190,
       .min_microseconds = 600,
       .max_microseconds = 2400,
     };
