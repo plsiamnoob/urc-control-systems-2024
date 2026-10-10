@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 #include <libhal-util/steady_clock.hpp>
 #include <libhal-util/can.hpp>
 #include <libhal/units.hpp>
@@ -66,9 +66,9 @@ struct mit_pd_mode_parameters {
 struct force_position_hybrid_mode_parameters {
   /// @brief Position parameter (degrees)
   float position;
-  /// @brief Velocity parameter (RPM) with float precision of three digits only
+  /// @brief Velocity parameter (RPM) with float precision of two digits only
   float velocity;
-  /// @brief Percentage of maximum current allowed by the motor for torque (in Amperes) (Range 0.000 - 1.000) with float precision of three digits only
+  /// @brief Percentage of maximum current allowed by the motor for torque (in Amperes) (Range 0.000 - 1.000) with float precision of four digits only
   float torque_current_limit;
 };
 
