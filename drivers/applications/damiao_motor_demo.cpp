@@ -23,35 +23,49 @@ void application()
   damiao_motor_settings set{
     .master_id = 0x34,
     .can_id = 0x0012,
-    .pos_max = 14400.0f,
-    .pos_min = -14400.0f,
-    .vel_min = -240.0f,
-    .vel_max = 240.0f,
-    .Kp_min = 0.0f,
-    .Kp_max = 500.0f,
-    .Kd_min = 0.0f,
-    .Kd_max = 5.0f,
-    .torque_min = -200.0f,
-    .torque_max = 200.0f,
+    .minimum_position = -14400.0f,
+    .maximum_position = 14400.0f,
+    .minimum_velocity = -240.0f,
+    .maximum_velocity = 240.0f,
+    .minimum_proportional_gain = 0.0f,
+    .maximum_proportional_gain = 500.0f,
+    .minimum_derivative_gain = 0.0f,
+    .maximum_derivative_gain = 5.0f,
+    .minimum_torque = -200.0f,
+    .maximum_torque = 200.0f,
+  };
+
+  mit_pd_mode_parameters mit_pd_param{
+    .position = 150.0f,
+    .velocity = 0.0f,
+    .proportional_gain = 6.0f,
+    .derivative_gain = 1.2f,
+    .torque_feed_forward = 0.0f
+  };
+
+  force_position_hybrid_mode_parameters force_position_hybrid_param {
+    .position = 0.0f,
+    .velocity = 30.0f,
+    .torque_current_limit = 0.8f
   };
 
   damiao_motor motor(can_transceiver, set, clock);
   try{
   motor.enable();
-  motor.mit(150.0f, 0.0f, 6.0f, 1.2f, 0.0f);
+  motor.mit_pd_mode(mit_pd_param);
   print_data(motor, clock, std::chrono::milliseconds(1500), console);
   hal::delay(*clock, 300ms);
 
-  motor.position_velocity(550, 20);
+  motor.position_velocity_mode(550, 20);
   print_data(motor, clock, std::chrono::milliseconds(5000), console);
   hal::delay(*clock, 300ms);
 
-  motor.velocity_start(-50);
+  motor.velocity_mode_start(-50);
   print_data(motor, clock, std::chrono::milliseconds(3000), console);
-  motor.velocity_stop();
+  motor.velocity_mode_stop();
   hal::delay(*clock, 300ms);
   
-  motor.force_position_hybrid(0, 30, 0.8);
+  motor.force_position_hybrid_mode(force_position_hybrid_param);
   print_data(motor, clock, std::chrono::milliseconds(3000), console);
 
   motor.disable();
